@@ -20,8 +20,7 @@ namespace QRCodeCreator
 				};
 				if (checks.Any(x => !x))
 				{
-					await Console.Out.WriteLineAsync("Please update config.json with a valid link!");
-					return;
+					throw new ConfigInvalidException(configFilePath, "Please update config.json with a valid link!");
 				}
 				await Console.Out.WriteLineAsync($"Generating QR code for link: {config.Link}");
 				using (QRCodeGenerator generator = new QRCodeGenerator())
@@ -36,7 +35,7 @@ namespace QRCodeCreator
 			}
 			catch (ConfigInvalidException ex)
 			{
-				await Console.Out.WriteLineAsync(ex.Message);
+				await Console.Out.WriteLineAsync($"{ex.Message}, {ex.AdditionalMessage}");
 
 			}
 			catch (Exception ex)
