@@ -8,6 +8,7 @@ namespace QRCodeCreator
 	{
 		internal static async Task Main(string[] args)
 		{
+			Console.Clear();
 			AppConfig config;
 			try
 			{
