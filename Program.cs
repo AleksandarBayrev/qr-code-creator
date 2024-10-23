@@ -29,7 +29,9 @@ namespace QRCodeCreator
 				using (PngByteQRCode code = new PngByteQRCode(data))
 				{
 					byte[] generatedQrCode = code.GetGraphic(20);
-					await File.WriteAllBytesAsync(Path.Combine(Directory.GetCurrentDirectory(), $"qr-code-{DateTime.Now.ToString("yyyy_MM_dd_HH:mm:sss_fff")}.png"), generatedQrCode);
+					var fileToSave = Path.Combine(Directory.GetCurrentDirectory(), $"qr-code-{DateTime.Now.ToString("yyyyMMdd_HHmmsssfff")}.png");
+					await File.WriteAllBytesAsync(fileToSave, generatedQrCode);
+					await Console.Out.WriteLineAsync($"Your file is saved in: {fileToSave}");
 				}
 			}
 			catch (ConfigInvalidException ex)
