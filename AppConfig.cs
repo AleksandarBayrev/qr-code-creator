@@ -6,6 +6,7 @@ namespace QRCodeCreator
     [DataContract]
     public struct AppConfig
     {
+        [DataMember]
         [JsonPropertyName("link")]
         public string Link { get; init; }
     }
