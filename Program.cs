@@ -13,15 +13,6 @@ namespace QRCodeCreator
 			try
 			{
 				config = await ParseConfig(configFilePath);
-				var checks = new List<bool>
-				{
-					!string.IsNullOrEmpty(config.Link),
-					Uri.IsWellFormedUriString(config.Link, UriKind.Absolute)
-				};
-				if (checks.Any(x => !x))
-				{
-					throw new ConfigInvalidException(configFilePath, "Please update config.json with a valid link!");
-				}
 				await Console.Out.WriteLineAsync($"Generating QR code for link: {config.Link}");
 				using (QRCodeGenerator generator = new QRCodeGenerator())
 				using (QRCodeData data = generator.CreateQrCode(config.Link, QRCodeGenerator.ECCLevel.Q))
@@ -35,8 +26,11 @@ namespace QRCodeCreator
 			}
 			catch (ConfigInvalidException ex)
 			{
-				await Console.Out.WriteLineAsync($"{ex.Message}, {ex.AdditionalMessage}");
-
+				await Console.Out.WriteLineAsync(
+					!string.IsNullOrEmpty(ex.AdditionalMessage)
+					? $"{ex.Message}, {ex.AdditionalMessage}"
+					: ex.Message
+				);
 			}
 			catch (Exception ex)
 			{
@@ -48,12 +42,22 @@ namespace QRCodeCreator
 		{
 			try
 			{
-				return JsonSerializer.Deserialize<AppConfig>(await File.ReadAllTextAsync(path));
+				var config = JsonSerializer.Deserialize<AppConfig>(await File.ReadAllTextAsync(path));
+				var checks = new List<bool>
+				{
+					!string.IsNullOrEmpty(config.Link),
+					Uri.IsWellFormedUriString(config.Link, UriKind.Absolute)
+				};
+				if (checks.Any(x => !x))
+				{
+					throw new ConfigInvalidException(configFilePath, "Please update config.json with a valid link!");
+				}
+				return config;
 
 			}
 			catch (System.Text.Json.JsonException ex)
 			{
-				throw new ConfigInvalidException(path);
+				throw new ConfigInvalidException(path, "");
 			}
 			catch (Exception)
 			{
